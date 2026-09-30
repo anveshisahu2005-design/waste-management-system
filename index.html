@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoClean - Municipal Smart Waste Management System</title>
+  <!-- Security Meta Tags -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            eco: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Active Role Notification Bar -->
+  <div id="active-role-notice" class="hidden"></div>
+
+  <!-- Header Navigation -->
+  <header class="glass-header sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="App.switchTab('report-issue')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md text-xl">
+            🌱
+          </div>
+          <div>
+            <div class="font-extrabold text-lg text-slate-800 tracking-tight font-heading leading-tight flex items-center gap-1.5">
+              EcoClean <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded">Smart City</span>
+            </div>
+            <div class="text-[11px] text-slate-500 font-medium">Municipal Waste Management Portal</div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs (Desktop) -->
+        <nav class="hidden lg:flex items-center gap-1 nav-tabs-wrapper">
+          <button class="nav-tab-btn active" data-tab="report-issue">
+            <span>🚨</span> Report Issue
+          </button>
+          <button class="nav-tab-btn" data-tab="pickup-request">
+            <span>🚚</span> Pickup Request
+          </button>
+          <button class="nav-tab-btn" data-tab="complaint-tracking">
+            <span>🔍</span> Track Status
+          </button>
+          <button class="nav-tab-btn" data-tab="admin-dashboard">
+            <span>🛡️</span> Admin Dashboard
+          </button>
+          <button class="nav-tab-btn" data-tab="waste-awareness">
+            <span>📚</span> Waste Awareness
+          </button>
+        </nav>
+
+        <!-- User Profile & Action Area -->
+        <div class="flex items-center gap-3">
+          <div id="header-user-section"></div>
+
+          <!-- Mobile Hamburger -->
+          <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Drawer Navigation -->
+      <div id="mobile-drawer" class="hidden lg:hidden border-t py-3 space-y-1">
+        <button class="nav-tab-btn w-full text-left" data-tab="report-issue" onclick="document.getElementById('mobile-drawer').classList.add('hidden')">
+          <span>🚨</span> Report Waste Issue
+        </button>
+        <button class="nav-tab-btn w-full text-left" data-tab="pickup-request" onclick="document.getElementById('mobile-drawer').classList.add('hidden')">
+          <span>🚚</span> Waste Pickup Request
+        </button>
+        <button class="nav-tab-btn w-full text-left" data-tab="complaint-tracking" onclick="document.getElementById('mobile-drawer').classList.add('hidden')">
+          <span>🔍</span> Track Status
+        </button>
+        <button class="nav-tab-btn w-full text-left" data-tab="admin-dashboard" onclick="document.getElementById('mobile-drawer').classList.add('hidden')">
+          <span>🛡️</span> Admin Dashboard
+        </button>
+        <button class="nav-tab-btn w-full text-left" data-tab="waste-awareness" onclick="document.getElementById('mobile-drawer').classList.add('hidden')">
+          <span>📚</span> Waste Awareness & Quiz
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="eco-hero-gradient text-white py-10 px-4 sm:px-6 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 bg-emerald-800/60 backdrop-blur border border-emerald-400/30 text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Centralized Municipal Waste & Segregation Intelligence</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-heading leading-tight">
+          Keep Our City Clean, Segregated & Sustainable.
+        </h1>
+        <p class="text-emerald-100/90 text-sm sm:text-base mt-2.5 leading-relaxed">
+          Report overflowing bins, request doorstep collection for e-waste & bulky scrap, track resolution in real-time with photo proofs, and learn proper 6-bin segregation.
+        </p>
+
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap items-center gap-3 mt-5">
+          <button onclick="App.switchTab('report-issue')" class="btn bg-white text-emerald-900 hover:bg-emerald-50 text-sm font-bold shadow-lg">
+            🚨 Report Waste Issue
+          </button>
+          <button onclick="App.switchTab('pickup-request')" class="btn bg-emerald-800/80 hover:bg-emerald-800 text-white border border-emerald-500/40 text-sm font-semibold">
+            🚚 Schedule Pickup
+          </button>
+          <button onclick="App.switchTab('waste-awareness')" class="btn bg-transparent hover:bg-white/10 text-emerald-100 text-sm font-medium">
+            🎯 Play Sorting Quiz (+Points)
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Ribbon -->
+      <div class="grid grid-cols-2 gap-3 w-full md:w-auto">
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl text-center">
+          <div class="text-2xl sm:text-3xl font-black text-white">96.4%</div>
+          <div class="text-xs text-emerald-200 font-medium mt-0.5">Complaints Resolved</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl text-center">
+          <div class="text-2xl sm:text-3xl font-black text-white">3.4 hrs</div>
+          <div class="text-xs text-emerald-200 font-medium mt-0.5">Avg Turnaround Time</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl text-center">
+          <div class="text-2xl sm:text-3xl font-black text-white">42 Tons</div>
+          <div class="text-xs text-emerald-200 font-medium mt-0.5">Diverted to Recycling</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl text-center">
+          <div class="text-2xl sm:text-3xl font-black text-white">+50 Pts</div>
+          <div class="text-xs text-emerald-200 font-medium mt-0.5">Earned per Report</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Application Body -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- SECTION 1: REPORT WASTE ISSUES -->
+    <section id="section-report-issue" class="app-section">
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider">
+          <span>Feature 2</span> • <span>Citizen Reporting</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 font-heading">Report a Waste Problem</h2>
+        <p class="text-sm text-slate-500 mt-1">
+          Spot garbage piles, overflowing community bins, or missed collections? Pin the location, upload a photo, and our sanitation crew will respond.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Main Form (8 Cols) -->
+        <div class="lg:col-span-8">
+          <form id="report-issue-form" class="eco-card p-6 sm:p-8 space-y-6">
+            
+            <!-- Category Picker -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2.5">
+                1. Select Waste Issue Category <span class="text-rose-500">*</span>
+              </label>
+              <div id="issue-category-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
+
+            <!-- Photo Upload Area -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-1.5">
+                2. Upload or Take Photo Proof
+              </label>
+              <p class="text-xs text-slate-500 mb-2">Photo proof helps sanitation supervisors allocate the right truck size and tools.</p>
+
+              <!-- Upload Drag/Drop Box -->
+              <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center hover:border-emerald-500 bg-slate-50 transition relative">
+                <input type="file" id="report-photo-input" accept="image/*" class="sr-only">
+                
+                <div id="photo-upload-placeholder" class="cursor-pointer" onclick="document.getElementById('report-photo-input').click()">
+                  <div class="text-3xl mb-1 text-slate-400">📸</div>
+                  <div class="text-xs font-semibold text-slate-700">Click to choose image or snap photo</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">PNG, JPG, or WEBP up to 10MB</div>
+                </div>
+
+                <!-- Preview Box -->
+                <div id="photo-preview-wrapper" class="hidden relative inline-block">
+                  <img id="photo-preview-img" src="" class="max-h-48 rounded-lg shadow-md border mx-auto">
+                  <button type="button" id="remove-photo-btn" class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow hover:bg-rose-700">
+                    &times;
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Sample Photos -->
+              <div id="sample-photo-picker" class="mt-2.5"></div>
+            </div>
+
+            <!-- Location & Map -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-sm font-bold text-slate-800">
+                  3. Waste Location & Coordinates <span class="text-rose-500">*</span>
+                </label>
+                <button type="button" id="detect-gps-btn" class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1 transition">
+                  📍 Auto-Detect My GPS
+                </button>
+              </div>
+
+              <!-- Interactive Click Map Simulator -->
+              <div class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 mb-3 cursor-crosshair">
+                <div id="report-pin-map" class="map-svg-grid h-48 w-full relative">
+                  <div class="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded text-[11px] font-semibold text-slate-700 shadow-sm pointer-events-none">
+                    🎯 Click anywhere on the map to drop pin
+                  </div>
+                  <div id="report-map-pin" class="hidden map-marker-pin">
+                    <div class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs shadow-lg border-2 border-white ring-2 ring-rose-500/30">
+                      📍
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs text-slate-500 mb-3">
+                <span id="report-coords-tag" class="hidden font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"></span>
+                <span class="text-[11px] text-slate-400">Ward coordinates feed into municipal dispatch router</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Municipal Ward Zone:</label>
+                  <select name="ward" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800">
+                    <option value="Ward 4 - Green Valley">Ward 4 - Green Valley (South-West)</option>
+                    <option value="Ward 2 - East Market">Ward 2 - East Market (Commercial)</option>
+                    <option value="Ward 5 - Metro Hub">Ward 5 - Metro Hub (Transit)</option>
+                    <option value="Ward 3 - Science City">Ward 3 - Science City (North)</option>
+                    <option value="Ward 1 - Central Zone">Ward 1 - Central Zone (Heritage)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Estimated Waste Volume:</label>
+                  <select name="volume" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800">
+                    <option value="Small Bag / Scattered">Small Bag / Scattered Litter</option>
+                    <option value="Medium Pile" selected>Medium Pile (Wheelbarrow / 240L Bin)</option>
+                    <option value="Large Dump (500L+)">Large Dump Heap (Compactor Required)</option>
+                    <option value="Commercial Truck Load">Commercial Dump (JCB / Loader Required)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-3">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Street Address & Landmark <span class="text-rose-500">*</span></label>
+                <input type="text" name="address" required placeholder="e.g. Opposite Fresh Mart, 14th Main Rd, Near Metro Pillar 84" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600">
+              </div>
+            </div>
+
+            <!-- Urgency Level -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2">
+                4. Urgency Level
+              </label>
+              <div class="grid grid-cols-3 gap-3">
+                <label class="cursor-pointer">
+                  <input type="radio" name="urgency" value="normal" checked class="peer sr-only">
+                  <div class="p-3 text-center rounded-xl border border-slate-200 bg-white peer-checked:border-slate-700 peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-slate-700 transition">
+                    <div class="text-sm font-bold text-slate-800">Normal</div>
+                    <div class="text-[10px] text-slate-500">Within 48 hrs</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="urgency" value="urgent" class="peer sr-only">
+                  <div class="p-3 text-center rounded-xl border border-slate-200 bg-white peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:ring-1 peer-checked:ring-amber-500 transition">
+                    <div class="text-sm font-bold text-amber-700">Urgent</div>
+                    <div class="text-[10px] text-amber-600">Within 24 hrs</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="urgency" value="critical" class="peer sr-only">
+                  <div class="p-3 text-center rounded-xl border border-slate-200 bg-white peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:ring-1 peer-checked:ring-rose-500 transition">
+                    <div class="text-sm font-bold text-rose-700">Critical</div>
+                    <div class="text-[10px] text-rose-600">Within 4-6 hrs</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-1">
+                5. Detailed Description <span class="text-rose-500">*</span>
+              </label>
+              <textarea name="description" required rows="3" placeholder="Describe the issue, presence of animals, foul odor, blocked pedestrian path, or potential bio-hazard..." class="w-full p-3 rounded-lg border border-slate-300 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-2">
+              <button type="submit" class="btn btn-primary w-full py-3.5 text-base font-bold shadow-lg">
+                🚀 Submit Complaint & Generate Tracking ID (+50 Eco-Points)
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sidebar Info (4 Cols) -->
+        <div class="lg:col-span-4 space-y-6">
+          <!-- Citizen Reward Card -->
+          <div class="eco-card p-5 bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-3xl">🌱</span>
+              <div>
+                <h4 class="font-bold text-emerald-950 text-sm">Civic Green Rewards</h4>
+                <p class="text-[11px] text-emerald-700">Participate in clean city initiatives</p>
+              </div>
+            </div>
+            <p class="text-xs text-emerald-900 leading-relaxed">
+              Every verified waste report earns you <strong>+50 Eco-Points</strong>. Redeem points for municipal property tax rebates, public transit passes, or saplings!
+            </p>
+            <div class="mt-3 pt-3 border-t border-emerald-200/60 flex items-center justify-between text-xs font-bold text-emerald-800">
+              <span>Your Status: Level 3 Guardian</span>
+              <button onclick="Auth.openProfileModal()" class="text-emerald-700 underline text-xs">View Points</button>
+            </div>
+          </div>
+
+          <!-- Hotline Card -->
+          <div class="eco-card p-5 bg-white">
+            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-2">
+              <span>📞</span> Municipal Sanitation Hotline
+            </h4>
+            <div class="space-y-2 text-xs text-slate-600">
+              <p>For chemical spills, bio-hazard emergencies, or dead animal removal:</p>
+              <div class="p-2.5 bg-slate-50 rounded-lg border text-slate-800 font-mono font-bold">
+                Toll-Free Control Room: 1800-425-CLEAN (25326)
+              </div>
+              <p class="text-[11px] text-slate-400">Available 24x7 with GPS-tracked rapid vehicles.</p>
+            </div>
+          </div>
+
+          <!-- Quick FAQ -->
+          <div class="eco-card p-5 bg-white">
+            <h4 class="font-bold text-slate-800 text-sm mb-3">Frequent Questions</h4>
+            <div class="space-y-3 text-xs">
+              <div>
+                <strong class="text-slate-800 block">How long does resolution take?</strong>
+                <span class="text-slate-500">Critical hazards are dispatched in 1 hour. Normal complaints are resolved within 24 to 48 hours.</span>
+              </div>
+              <div>
+                <strong class="text-slate-800 block">Can I track with before/after photos?</strong>
+                <span class="text-slate-500">Yes! Once the crew clears the spot, they are required to upload a sanitized site photo before closing the ticket.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: WASTE PICKUP REQUEST -->
+    <section id="section-pickup-request" class="app-section hidden">
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-wider">
+          <span>Feature 3</span> • <span>Doorstep Special Collection</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 font-heading">On-Demand Waste Pickup Request</h2>
+        <p class="text-sm text-slate-500 mt-1">
+          Have heavy furniture, obsolete electronic appliances, bulk relocation cardboard, or garden trimmings? Book a municipal doorstep collection vehicle.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-8">
+          <form id="pickup-request-form" class="eco-card p-6 sm:p-8 space-y-6">
+            <!-- Waste Type Selection -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2.5">
+                1. Select Special Waste Stream <span class="text-rose-500">*</span>
+              </label>
+              <div id="pickup-type-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+              <div id="pickup-type-hint" class="text-xs text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 mt-2 font-medium"></div>
+            </div>
+
+            <!-- Items Description -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-1">
+                2. Summary of Items & Approximate Count <span class="text-rose-500">*</span>
+              </label>
+              <textarea name="itemsSummary" required rows="2" placeholder="e.g. 1 Broken wooden wardrobe (disassembled), 2 old desktop computers, 4 bags of dry leaves..." class="w-full p-2.5 rounded-lg border border-slate-300 text-xs text-slate-800 focus:ring-2 focus:ring-emerald-500/20"></textarea>
+            </div>
+
+            <!-- Weight & Date / Time Slot -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Estimated Total Weight:</label>
+                <select name="estimatedWeight" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800">
+                  <option value="Under 20 kg">Under 20 kg (Light)</option>
+                  <option value="20 - 50 kg" selected>20 - 50 kg (Standard)</option>
+                  <option value="50 - 150 kg">50 - 150 kg (Heavy Bulk)</option>
+                  <option value="150+ kg (Mini-truck load)">150+ kg (Mini-truck Load)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Preferred Date: <span class="text-rose-500">*</span></label>
+                <input type="date" id="pickup-date" name="pickupDate" required class="w-full p-2.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Time Window: <span class="text-rose-500">*</span></label>
+                <select name="timeSlot" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800">
+                  <option value="08:00 AM - 11:00 AM">Morning (08 AM - 11 AM)</option>
+                  <option value="01:00 PM - 04:00 PM">Afternoon (01 PM - 04 PM)</option>
+                  <option value="04:00 PM - 07:00 PM">Evening (04 PM - 07 PM)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-1">
+                3. Doorstep Pickup Address & Contact <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" name="pickupAddress" required placeholder="Flat/House number, Building name, Street, Ward, Pincode" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs text-slate-800 mb-2">
+              <input type="text" name="specialNotes" placeholder="Special driver instructions (e.g., Gate code 4092, Elevator available, items placed in porch)" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs text-slate-800">
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="btn btn-primary w-full py-3.5 text-base font-bold shadow-lg">
+                🚚 Confirm Doorstep Pickup Booking (+30 Eco-Points)
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="lg:col-span-4 space-y-6">
+          <div class="eco-card p-5 bg-blue-50 border-blue-200">
+            <h4 class="font-bold text-blue-900 text-sm mb-2">Free Municipal Community Quota</h4>
+            <p class="text-xs text-blue-800 leading-relaxed">
+              Every residential household is entitled to <strong>2 Free Special Pickups per year</strong> for bulk furniture, garden green waste, and recyclable electronics.
+            </p>
+            <div class="mt-3 p-2 bg-white/70 rounded-lg text-[11px] font-semibold text-blue-950">
+              Remaining Quota: 2 of 2 Free Pickups
+            </div>
+          </div>
+
+          <div class="eco-card p-5 bg-white">
+            <h4 class="font-bold text-slate-800 text-sm mb-3">Vehicle Capacity & Guidelines</h4>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li>• Disconnect all electronic wiring before pickup</li>
+              <li>• Bundle tree branches with twine or sacks</li>
+              <li>• Keep driveway clear for the hydraulic mini-tipper truck</li>
+              <li>• Driver will provide a digital electronic receipt upon loading</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: COMPLAINT TRACKING -->
+    <section id="section-complaint-tracking" class="app-section hidden">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider">
+            <span>Feature 4</span> • <span>Live Transparency</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 font-heading">Complaint & Pickup Tracking</h2>
+          <p class="text-sm text-slate-500 mt-1">
+            Track reported issues and doorstep collections with step-by-step audit timelines, crew assignment, and before/after verification.
+          </p>
+        </div>
+
+        <!-- Toggle between Complaints and Pickups -->
+        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border">
+          <button id="tracking-tab-complaints" class="px-4 py-2 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow transition">
+            Waste Issues
+          </button>
+          <button id="tracking-tab-pickups" class="px-4 py-2 text-xs font-bold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+            Doorstep Pickups
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Status Filter Bar -->
+      <div class="eco-card p-4 mb-6 bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="relative w-full sm:w-80">
+          <input type="text" id="tracking-search-input" placeholder="Search by ID (e.g. WM-2026-1042), Ward, or Title..." class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500/20">
+          <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+        </div>
+
+        <!-- Filter pills for Complaints -->
+        <div id="tracking-status-filters" class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto py-1">
+          <button class="tracking-filter-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-800 text-white active" data-status="all">All</button>
+          <button class="tracking-filter-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-slate-600 border border-slate-200 hover:border-slate-300" data-status="submitted">Logged</button>
+          <button class="tracking-filter-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-slate-600 border border-slate-200 hover:border-slate-300" data-status="under_review">In Review</button>
+          <button class="tracking-filter-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-slate-600 border border-slate-200 hover:border-slate-300" data-status="in_progress">In Progress</button>
+          <button class="tracking-filter-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-slate-600 border border-slate-200 hover:border-slate-300" data-status="resolved">Resolved</button>
+        </div>
+      </div>
+
+      <!-- Tracking Cards Container -->
+      <div id="tracking-cards-list" class="space-y-4"></div>
+    </section>
+
+    <!-- SECTION 4: ADMIN DASHBOARD -->
+    <section id="section-admin-dashboard" class="app-section hidden">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-bold text-purple-600 uppercase tracking-wider">
+            <span>Feature 5</span> • <span>Municipal Control Room</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 font-heading">Centralized Admin & Hotspots Dashboard</h2>
+          <p class="text-sm text-slate-500 mt-1">
+            Real-time complaint monitoring, waste hotspot detection, crew dispatch management, and service performance analytics.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="admin-export-csv-btn" class="btn btn-secondary text-xs py-2 px-3.5">
+            📥 Export Municipal Report (CSV)
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs Summary Cards -->
+      <div id="admin-kpis-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"></div>
+
+      <!-- Waste Hotspots Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+        <!-- Interactive Hotspot Map (8 cols) -->
+        <div class="lg:col-span-8 eco-card p-5 bg-white">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                <span>🔥</span> Waste Hotspot Density & Real-Time Heatmap
+              </h3>
+              <p class="text-xs text-slate-400">Click any pulsing marker on the map to review chronic dumping areas and dispatch teams</p>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-700">Live Telemetry</span>
+          </div>
+
+          <div id="admin-hotspots-canvas" class="map-canvas-container"></div>
+
+          <div class="flex flex-wrap items-center gap-4 mt-3 text-xs text-slate-500 pt-2 border-t">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> High Critical Risk</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Moderate Overflow</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Low / Monitored</span>
+          </div>
+        </div>
+
+        <!-- Hotspot List (4 cols) -->
+        <div class="lg:col-span-4 eco-card p-5 bg-white flex flex-col">
+          <h3 class="font-bold text-slate-800 text-sm mb-1">Identified Waste Hotspots</h3>
+          <p class="text-xs text-slate-400 mb-3">Prioritized based on frequency of citizen reports</p>
+          <div id="admin-hotspots-list" class="space-y-2 overflow-y-auto max-h-[350px] flex-grow pr-1"></div>
+        </div>
+      </div>
+
+      <!-- Complaints Management Table -->
+      <div class="eco-card p-5 bg-white mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800 text-base">Sanitation Complaints Dispatcher</h3>
+            <p class="text-xs text-slate-400">Assign sanitation vehicles, update resolution phases, and attach sanitized site proofs</p>
+          </div>
+
+          <!-- Ward & Status Filter dropdowns -->
+          <div class="flex items-center gap-2">
+            <select id="admin-ward-filter" class="p-1.5 text-xs font-semibold rounded-lg border border-slate-300 text-slate-700">
+              <option value="all">All Wards</option>
+              <option value="Ward 4 - Green Valley">Ward 4 - Green Valley</option>
+              <option value="Ward 2 - East Market">Ward 2 - East Market</option>
+              <option value="Ward 5 - Metro Hub">Ward 5 - Metro Hub</option>
+              <option value="Ward 3 - Science City">Ward 3 - Science City</option>
+            </select>
+
+            <select id="admin-status-filter" class="p-1.5 text-xs font-semibold rounded-lg border border-slate-300 text-slate-700">
+              <option value="all">All Statuses</option>
+              <option value="submitted">Logged</option>
+              <option value="under_review">Under Review</option>
+              <option value="assigned">Assigned</option>
+              <option value="in_progress">In Progress</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/70">
+                <th class="py-2.5 px-3">Ticket ID</th>
+                <th class="py-2.5 px-3">Title & Category</th>
+                <th class="py-2.5 px-3">Ward</th>
+                <th class="py-2.5 px-3">Urgency</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Assigned Fleet</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-complaints-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Doorstep Pickups Management Table -->
+      <div class="eco-card p-5 bg-white">
+        <h3 class="font-bold text-slate-800 text-base mb-1">Scheduled Doorstep Pickup Manifest</h3>
+        <p class="text-xs text-slate-400 mb-4">Manage special collection routes for bulky scrap and e-waste</p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/70">
+                <th class="py-2.5 px-3">Ref ID</th>
+                <th class="py-2.5 px-3">Waste Category</th>
+                <th class="py-2.5 px-3">Citizen Contact</th>
+                <th class="py-2.5 px-3">Scheduled Slot</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Driver</th>
+                <th class="py-2.5 px-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-pickups-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: WASTE AWARENESS & EDUCATION -->
+    <section id="section-waste-awareness" class="app-section hidden">
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider">
+          <span>Feature 6</span> • <span>Segregation Awareness & Gamification</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 font-heading">Waste Awareness & Segregation Hub</h2>
+        <p class="text-sm text-slate-500 mt-1">
+          Proper segregation at source is the foundation of a clean city. Learn the standard 6-bin system, test your skills in the mini-game, and calculate your eco-savings.
+        </p>
+      </div>
+
+      <!-- Search Waste Items Bar -->
+      <div class="eco-card p-4 mb-8 bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="relative w-full sm:w-96">
+          <input type="text" id="awareness-search-input" placeholder="Search any item (e.g. pizza box, batteries, mango peel, milk carton)..." class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500/20">
+          <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+        </div>
+        <div class="text-xs text-slate-500 font-medium">
+          Instant classification guide for 6 municipal bins
+        </div>
+      </div>
+
+      <!-- 6-Bin Color-Coded Segregation Cards -->
+      <div class="mb-10">
+        <h3 class="text-lg font-bold text-slate-800 mb-3">Municipal 6-Bin Segregation Standard</h3>
+        <div id="bins-guide-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+
+      <!-- Interactive Segregation Game / Quiz & Eco-Impact Calculator Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+        <!-- Gamified Quiz (6 cols) -->
+        <div class="lg:col-span-6 flex flex-col">
+          <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <span>🎯</span> Interactive "Sort the Waste" Mini-Game
+          </h3>
+          <div id="quiz-card-container" class="flex-grow"></div>
+        </div>
+
+        <!-- Eco-Savings Calculator (6 cols) -->
+        <div class="lg:col-span-6 flex flex-col">
+          <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <span>🌱</span> Community Eco-Savings & Carbon Calculator
+          </h3>
+          <div class="eco-card p-6 bg-white flex-grow flex flex-col justify-between">
+            <p class="text-xs text-slate-500 mb-4">
+              Adjust monthly segregated waste to see how much water, trees, and carbon emissions you save:
+            </p>
+
+            <!-- Sliders -->
+            <div class="space-y-4 text-xs mb-6">
+              <div>
+                <div class="flex justify-between font-bold text-slate-700 mb-1">
+                  <span>📰 Paper & Cardboard Recycled:</span>
+                  <span id="calc-paper-val" class="text-blue-700">10 kg/month</span>
+                </div>
+                <input type="range" id="calc-paper" min="0" max="60" value="10" class="w-full accent-blue-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between font-bold text-slate-700 mb-1">
+                  <span>🥤 Clean Plastics Recycled:</span>
+                  <span id="calc-plastic-val" class="text-emerald-700">5 kg/month</span>
+                </div>
+                <input type="range" id="calc-plastic" min="0" max="40" value="5" class="w-full accent-emerald-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between font-bold text-slate-700 mb-1">
+                  <span>🍌 Organic Food Waste Composted:</span>
+                  <span id="calc-wet-val" class="text-amber-700">15 kg/month</span>
+                </div>
+                <input type="range" id="calc-wet" min="0" max="80" value="15" class="w-full accent-amber-600 cursor-pointer">
+              </div>
+            </div>
+
+            <!-- Dynamic Outputs -->
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t">
+              <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-center">
+                <span class="text-[10px] uppercase font-bold text-blue-700 block">Water Conserved</span>
+                <span id="calc-res-water" class="text-xl font-extrabold text-blue-900 mt-0.5 block">260 Liters</span>
+              </div>
+              <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-center">
+                <span class="text-[10px] uppercase font-bold text-emerald-700 block">Trees Saved</span>
+                <span id="calc-res-trees" class="text-xl font-extrabold text-emerald-900 mt-0.5 block">0.17 Trees</span>
+              </div>
+              <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 text-center">
+                <span class="text-[10px] uppercase font-bold text-purple-700 block">CO₂ Emissions Prevented</span>
+                <span id="calc-res-co2" class="text-xl font-extrabold text-purple-900 mt-0.5 block">33 kg CO₂e</span>
+              </div>
+              <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-center">
+                <span class="text-[10px] uppercase font-bold text-amber-700 block">Organic Compost Made</span>
+                <span id="calc-res-compost" class="text-xl font-extrabold text-amber-900 mt-0.5 block">6.0 kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community Dos & Don'ts -->
+      <div class="eco-card p-6 bg-white">
+        <h3 class="text-lg font-bold text-slate-800 mb-4">Golden Rules of Waste Segregation</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed">
+          <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200">
+            <h4 class="font-bold text-emerald-900 text-sm mb-2 flex items-center gap-1.5">
+              <span>✅</span> The Essential DOs
+            </h4>
+            <ul class="space-y-2 text-emerald-950">
+              <li>• <strong>Rinse all food residue:</strong> Wash milk sachets, oil pouches, and plastic yogurt cups with a splash of water before putting them in the dry recycling bin.</li>
+              <li>• <strong>Keep separate dustbins:</strong> Place at least two dustbins in the kitchen (Green for wet food, Blue for dry packaging).</li>
+              <li>• <strong>Wrap sanitary waste safely:</strong> Wrap baby diapers and pads in old newspapers and mark with a red cross (X) so sanitation workers are forewarned.</li>
+              <li>• <strong>Compost at home:</strong> Turn vegetable scraps and tea bags into black gold for your balcony plants.</li>
+            </ul>
+          </div>
+
+          <div class="bg-rose-50/70 p-4 rounded-xl border border-rose-200">
+            <h4 class="font-bold text-rose-900 text-sm mb-2 flex items-center gap-1.5">
+              <span>❌</span> The Critical DON'Ts
+            </h4>
+            <ul class="space-y-2 text-rose-950">
+              <li>• <strong>Never mix wet & dry waste:</strong> Once clean cardboard or paper is wet with rotting vegetable liquids, it can no longer be recycled.</li>
+              <li>• <strong>Never burn plastic or fallen leaves:</strong> Burning garbage releases toxic dioxins and carcinogens into our neighborhood air.</li>
+              <li>• <strong>Don't flush wet wipes or plastic:</strong> They do not break down in sewage pipes and cause major urban storm drain blockages.</li>
+              <li>• <strong>Don't dump batteries into normal bins:</strong> Heavy metals like lithium and lead seep into drinking aquifers. Always hand them over to E-Waste collection.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODALS -->
+
+  <!-- 1. Authentication Modal (Register / Login) -->
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="p-6">
+        <div class="flex items-center justify-between pb-3 border-b mb-4">
+          <div class="flex gap-4">
+            <button id="tab-login-btn" onclick="document.getElementById('login-panel').classList.remove('hidden'); document.getElementById('register-panel').classList.add('hidden'); this.className='text-base font-bold text-emerald-700 border-b-2 border-emerald-600 pb-1'; document.getElementById('tab-register-btn').className='text-base font-semibold text-slate-400 hover:text-slate-600 pb-1';" class="text-base font-bold text-emerald-700 border-b-2 border-emerald-600 pb-1">
+              Sign In
+            </button>
+            <button id="tab-register-btn" onclick="document.getElementById('register-panel').classList.remove('hidden'); document.getElementById('login-panel').classList.add('hidden'); this.className='text-base font-bold text-emerald-700 border-b-2 border-emerald-600 pb-1'; document.getElementById('tab-login-btn').className='text-base font-semibold text-slate-400 hover:text-slate-600 pb-1';" class="text-base font-semibold text-slate-400 hover:text-slate-600 pb-1">
+              Create Citizen Account
+            </button>
+          </div>
+          <button onclick="App.closeModal('auth-modal')" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+        </div>
+
+        <!-- Login Panel -->
+        <div id="login-panel">
+          <form id="login-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Email or Username</label>
+              <input type="text" name="identifier" required placeholder="e.g. anveshi or anveshi@citizen.org" autocomplete="username" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+              <input type="password" name="password" required placeholder="Enter your password" autocomplete="current-password" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+            </div>
+            <button type="submit" class="btn btn-primary w-full py-2.5 text-xs font-bold">
+              Sign In to EcoClean
+            </button>
+          </form>
+
+          <div class="mt-5 pt-4 border-t text-center">
+            <span class="text-xs text-slate-400 block">Role is assigned automatically from your account. Admin/driver credentials are provisioned by the municipality.</span>
+          </div>
+        </div>
+
+        <!-- Register Panel -->
+        <div id="register-panel" class="hidden">
+          <form id="register-form" class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+              <input type="text" name="name" required placeholder="e.g. Priya Sharma" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Username</label>
+                <input type="text" name="username" required placeholder="e.g. priya.sharma" autocomplete="username" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                <input type="password" name="password" required placeholder="Min 6 characters" autocomplete="new-password" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
+                <input type="email" name="email" required placeholder="priya@example.com" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+                <input type="tel" name="phone" required placeholder="+91 98765 00000" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500">Citizen accounts only. Admin/driver logins are provisioned by the municipality.</p>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Municipal Ward</label>
+              <select name="ward" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs font-semibold">
+                <option value="Ward 4 - Green Valley">Ward 4 - Green Valley</option>
+                <option value="Ward 2 - East Market">Ward 2 - East Market</option>
+                <option value="Ward 5 - Metro Hub">Ward 5 - Metro Hub</option>
+                <option value="Ward 3 - Science City">Ward 3 - Science City</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Residential Address</label>
+              <input type="text" name="address" placeholder="House/Flat number, Street name" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs">
+            </div>
+            <div class="pt-2">
+              <button type="submit" class="btn btn-primary w-full py-2.5 text-xs font-bold">
+                Complete Registration (+50 Eco-Points)
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Profile & Role Switcher Modal -->
+  <div id="profile-modal" class="modal-overlay">
+    <div class="modal-content" id="profile-modal-body"></div>
+  </div>
+
+  <!-- 3. Report Success Modal -->
+  <div id="report-success-modal" class="modal-overlay">
+    <div class="modal-content" id="report-success-body"></div>
+  </div>
+
+  <!-- 4. Pickup Success Modal -->
+  <div id="pickup-success-modal" class="modal-overlay">
+    <div class="modal-content" id="pickup-success-body"></div>
+  </div>
+
+  <!-- 5. Visual Timeline Modal -->
+  <div id="timeline-modal" class="modal-overlay">
+    <div class="modal-content" id="timeline-modal-body"></div>
+  </div>
+
+  <!-- 6. Before / After Comparison Modal -->
+  <div id="before-after-modal" class="modal-overlay">
+    <div class="modal-content" id="before-after-modal-body"></div>
+  </div>
+
+  <!-- 7. Admin Action & Hotspot Modal -->
+  <div id="admin-action-modal" class="modal-overlay">
+    <div class="modal-content" id="admin-action-modal-body"></div>
+  </div>
+
+  <!-- Toast Alert Notifications Container -->
+  <div id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-xs mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center gap-2 text-white font-bold text-base mb-2 font-heading">
+          <span>🌱</span> EcoClean Smart City Portal
+        </div>
+        <p class="text-slate-400 leading-relaxed">
+          Centralized municipal platform for citizen reporting, on-demand doorstep waste collection, hotspot prevention, and 6-bin source segregation.
+        </p>
+      </div>
+
+      <div>
+        <h5 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Core Features</h5>
+        <ul class="space-y-1.5">
+          <li><a href="#" onclick="App.switchTab('report-issue'); return false;" class="hover:text-emerald-400">1. Report Waste Issues</a></li>
+          <li><a href="#" onclick="App.switchTab('pickup-request'); return false;" class="hover:text-emerald-400">2. Waste Pickup Request</a></li>
+          <li><a href="#" onclick="App.switchTab('complaint-tracking'); return false;" class="hover:text-emerald-400">3. Live Complaint Tracking</a></li>
+          <li><a href="#" onclick="App.switchTab('admin-dashboard'); return false;" class="hover:text-emerald-400">4. Admin Hotspots Dashboard</a></li>
+          <li><a href="#" onclick="App.switchTab('waste-awareness'); return false;" class="hover:text-emerald-400">5. 6-Bin Awareness Guide</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Emergency Hotlines</h5>
+        <ul class="space-y-1.5">
+          <li>Central Sanitation Control: <span class="text-white font-semibold">1800-425-CLEAN</span></li>
+          <li>Hazmat & Spill Team: <span class="text-white font-semibold">108 / 112 Ext 4</span></li>
+          <li>E-Waste Recycling Drop: <span class="text-white font-semibold">Ward 4 Depot</span></li>
+          <li>Control Room Duty Officer: <span class="text-white font-semibold">Rajesh Verma</span></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Account Access</h5>
+        <p class="mb-3 text-[11px]">Citizens can self-register. Municipal admin and driver credentials are provisioned by the City Corporation. Role is assigned automatically at login.</p>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mt-8 border-t border-slate-800 text-center text-slate-500 text-[11px]">
+      © 2026 EcoClean Municipal Solid Waste Management Authority. All citizen rights reserved.
+    </div>
+  </footer>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/pickup.js"></script>
+  <script src="js/tracking.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/awareness.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
