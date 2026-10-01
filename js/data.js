@@ -591,7 +591,41 @@ class StorageManager {
       this.set("current_user", INITIAL_DATA.users[0]);
     }
   }
+  --- a/js/data.js
++++ b/js/data.js
+@@ -554,18 +554,24 @@ class StorageManager {
+-    // Always ensure official system accounts (admin, driver, seed citizen) exist with valid credentials.
+-    // SECURITY MIGRATION: drop legacy password-less accounts (pre-fix) so they
+-    // cannot bypass login; users must re-register with username+password.
++    // Always ensure official seed accounts exist with valid credentials.
++    // Preserve locally-created accounts with password hashes, including
++    // municipality officers created through the officer registration flow.
+     const existingUsers = this.get("users", []);
+     const updatedUsers = [...INITIAL_DATA.users];
+     for (const u of existingUsers) {
+-      if (updatedUsers.some(seed => seed.id === u.id || seed.email === u.email || (u.username && seed.username === u.username))) {
+-        continue; // seed version wins (has correct passwordHash + role)
++      if (updatedUsers.some(seed =>
++        seed.id === u.id ||
++        seed.email === u.email ||
++        (u.username && seed.username === u.username)
++      )) {
++        continue; // seed version wins for official demo accounts
+       }
+-      // Keep only accounts that have a password hash and citizen role
+-      if (u.passwordHash && u.role === "citizen") {
++      // Preserve only accounts that use the hashed-password model.
++      // This keeps custom citizen/admin/driver accounts across reloads.
++      if (u.passwordHash && (u.role === "citizen" || u.role === "admin" || u.role === "driver")) {
+         updatedUsers.push(u);
+       }
+-      // Legacy plaintext `password` field is never preserved
++      // Legacy plaintext `password` fields are never preserved.
+     }
+
 }
 
 // Initialize on script load
 StorageManager.initData();
+
+
