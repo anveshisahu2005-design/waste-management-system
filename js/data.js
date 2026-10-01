@@ -599,14 +599,16 @@ class StorageManager {
        * Citizens, municipality officers/admins and drivers are all
        * allowed to persist as long as they use passwordHash.
        */
-      if (
-        u.passwordHash &&
-        (u.role === "citizen" ||
-          u.role === "admin" ||
-          u.role === "driver")
-      ) {
-        updatedUsers.push(u);
-      }
+      if ( u.passwordHash &&
+  (
+    u.role === "citizen" ||
+    u.role === "admin" ||
+    u.role === "driver" ||
+    u.role === "municipality_officer"
+  )
+) {
+  updatedUsers.push(u);
+}
 
       /*
        * Never preserve legacy plaintext passwords.
