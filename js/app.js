@@ -20,7 +20,8 @@ const App = {
     // (Real enforcement must live on backend later; this stops casual tab-click bypass.)
     if (tabId === "admin-dashboard" && typeof Auth !== "undefined") {
       const u = Auth.getCurrentUser && Auth.getCurrentUser();
-      if (!u || (u.role !== "admin" && u.role !== "driver")) {
+      if (!u ||(u.role !== "admin" && u.role !== "driver" && u.role !== "municipality_officer")) 
+      {
         this.showToast("Admin dashboard requires municipal login. Please sign in.", "error");
         if (typeof Auth.openLoginModal === "function") Auth.openLoginModal();
         return;
